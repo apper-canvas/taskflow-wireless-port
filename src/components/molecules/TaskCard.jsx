@@ -55,13 +55,31 @@ return (
                 )}>
                 {task.title}
             </h3>
-            {task.description && <p
+{task.notes && <p
                 className={cn(
                     "text-slate-600 leading-relaxed transition-all duration-200",
                     task.completed && "line-through text-slate-400"
                 )}>
-                {task.description}
+                {task.notes.length > 120 ? `${task.notes.substring(0, 120)}...` : task.notes}
             </p>}
+{/* Attachments Indicators */}
+            {task.attachments && task.attachments.length > 0 && (
+              <div className="flex items-center gap-2 mt-2 text-xs">
+                {task.attachments.some(att => att.type === 'file') && (
+                  <div className="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded-full">
+                    <ApperIcon name="FileText" size={12} />
+                    <span>{task.attachments.filter(att => att.type === 'file').length}</span>
+                  </div>
+                )}
+                {task.attachments.some(att => att.type === 'link') && (
+                  <div className="flex items-center gap-1 px-2 py-1 bg-green-50 text-green-600 rounded-full">
+                    <ApperIcon name="ExternalLink" size={12} />
+                    <span>{task.attachments.filter(att => att.type === 'link').length}</span>
+                  </div>
+                )}
+              </div>
+            )}
+            
             <div className="flex items-center justify-between mt-4">
                 <div className="flex items-center gap-4 text-xs text-slate-400">
                     <div className="flex items-center gap-1">

@@ -10,9 +10,10 @@ import { cn } from "@/utils/cn";
 const TaskModal = ({ isOpen, onClose, onSubmit, initialData = null }) => {
 const [formData, setFormData] = useState({
     title: '',
-    description: '',
+    notes: '',
     dueDate: '',
-    category: ''
+    category: '',
+    attachments: []
   })
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -21,16 +22,18 @@ const [formData, setFormData] = useState({
 if (initialData) {
       setFormData({
 title: initialData.title || '',
-        description: initialData.description || '',
+        notes: initialData.notes || '',
         dueDate: initialData.dueDate ? initialData.dueDate.split('T')[0] : '',
-        category: initialData.category || ''
+        category: initialData.category || '',
+        attachments: initialData.attachments || []
       })
     } else {
       setFormData({
         title: '',
-description: '',
+notes: '',
         dueDate: '',
-        category: ''
+        category: '',
+        attachments: []
       })
     }
     setErrors({})
@@ -45,8 +48,8 @@ if (!formData.title.trim()) {
       newErrors.title = 'Title must be less than 100 characters'
     }
     
-    if (formData.description && formData.description.length > 500) {
-      newErrors.description = 'Description must be less than 500 characters'
+if (formData.notes && formData.notes.length > 2000) {
+      newErrors.notes = 'Notes must be less than 2000 characters'
     }
 
     if (formData.dueDate && new Date(formData.dueDate) < new Date().setHours(0, 0, 0, 0)) {
@@ -69,7 +72,7 @@ if (!formData.title.trim()) {
     setIsSubmitting(true)
 try {
       await onSubmit(formData)
-      setFormData({ title: '', description: '', dueDate: '' })
+setFormData({ title: '', notes: '', dueDate: '', category: '', attachments: [] })
       setErrors({})
       onClose()
     } catch (error) {
@@ -165,29 +168,171 @@ try {
               </div>
 
               {/* Description Field */}
-              <div className="space-y-2">
-                <label htmlFor="description" className="block text-sm font-semibold text-slate-700">
-                  Description <span className="text-slate-400 font-normal">(optional)</span>
+<div className="space-y-2">
+                <label htmlFor="notes" className="block text-sm font-semibold text-slate-700">
+                  Notes <span className="text-slate-400 font-normal">(optional)</span>
                 </label>
                 <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                  placeholder="Add more details about your task..."
-                  error={!!errors.description}
-                  rows={3}
-                  maxLength={500}
+                  id="notes"
+                  value={formData.notes}
+                  onChange={(e) => handleInputChange('notes', e.target.value)}
+                  placeholder="Add detailed notes, context, or additional information about your task..."
+                  error={!!errors.notes}
+                  rows={4}
+                  maxLength={2000}
                 />
-                {errors.description && (
+                {errors.notes && (
                   <p className="text-sm text-red-600 flex items-center gap-1">
                     <ApperIcon name="AlertCircle" size={14} />
-                    {errors.description}
+                    {errors.notes}
                   </p>
                 )}
                 <div className="flex justify-between text-xs text-slate-400">
-                  <span>{formData.description.length}/500 characters</span>
+                  <span>{formData.notes.length}/2000 characters</span>
                 </div>
-</div>
+              </div>
+
+              {/* Attachments Section */}
+              <div className="space-y-3">
+                <label className="block text-sm font-semibold text-slate-700">
+                  Attachments <span className="text-slate-400 font-normal">(optional)</span>
+                </label>
+                
+                {/* File Upload Area */}
+                <div className="border-2 border-dashed border-slate-300 rounded-lg p-4 text-center hover:border-indigo-400 transition-colors">
+                  <input
+                    type="file"
+                    id="file-upload"
+                    className="hidden"
+                    multiple
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files)
+                      files.forEach(file => {
+                        const reader = new FileReader()
+                        reader.onload = (event) => {
+                          const newAttachment = {
+                            id: `att-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                            type: 'file',
+                            name: file.name,
+                            size: file.size,
+                            data: event.target.result
+                          }
+                          setFormData(prev => ({
+                            ...prev,
+                            attachments: [...prev.attachments, newAttachment]
+                          }))
+                        }
+                        reader.readAsDataURL(file)
+                      })
+                      e.target.value = ''
+                    }}
+                  />
+                  <ApperIcon name="Upload" size={24} className="mx-auto text-slate-400 mb-2" />
+                  <p className="text-sm text-slate-600 mb-2">
+                    <label htmlFor="file-upload" className="text-indigo-600 hover:text-indigo-700 cursor-pointer font-medium">
+                      Click to upload files
+                    </label>
+                    {' '}or drag and drop
+                  </p>
+                  <p className="text-xs text-slate-400">PNG, JPG, PDF, DOC up to 10MB</p>
+                </div>
+
+                {/* Link Input */}
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Add a link (https://...)"
+                    value={formData.linkInput || ''}
+                    onChange={(e) => handleInputChange('linkInput', e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && formData.linkInput?.trim()) {
+                        e.preventDefault()
+                        const url = formData.linkInput.trim()
+                        if (url.startsWith('http://') || url.startsWith('https://')) {
+                          const newAttachment = {
+                            id: `att-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                            type: 'link',
+                            name: url.replace(/^https?:\/\//, '').split('/')[0],
+                            url: url
+                          }
+                          setFormData(prev => ({
+                            ...prev,
+                            attachments: [...prev.attachments, newAttachment],
+                            linkInput: ''
+                          }))
+                        }
+                      }
+                    }}
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (formData.linkInput?.trim()) {
+                        const url = formData.linkInput.trim()
+                        if (url.startsWith('http://') || url.startsWith('https://')) {
+                          const newAttachment = {
+                            id: `att-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                            type: 'link',
+                            name: url.replace(/^https?:\/\//, '').split('/')[0],
+                            url: url
+                          }
+                          setFormData(prev => ({
+                            ...prev,
+                            attachments: [...prev.attachments, newAttachment],
+                            linkInput: ''
+                          }))
+                        }
+                      }
+                    }}
+                  >
+                    <ApperIcon name="Plus" size={16} />
+                  </Button>
+                </div>
+
+                {/* Attachment List */}
+                {formData.attachments.length > 0 && (
+                  <div className="space-y-2">
+                    {formData.attachments.map((attachment) => (
+                      <div key={attachment.id} className="flex items-center justify-between p-2 bg-slate-50 rounded-lg border">
+                        <div className="flex items-center gap-2">
+                          <ApperIcon 
+                            name={attachment.type === 'file' ? 'FileText' : 'ExternalLink'} 
+                            size={16} 
+                            className={attachment.type === 'file' ? 'text-blue-600' : 'text-green-600'} 
+                          />
+                          <div>
+                            <p className="text-sm font-medium text-slate-700">{attachment.name}</p>
+                            {attachment.type === 'file' && attachment.size && (
+                              <p className="text-xs text-slate-500">
+                                {(attachment.size / 1024).toFixed(1)} KB
+                              </p>
+                            )}
+                            {attachment.type === 'link' && (
+                              <p className="text-xs text-slate-500 truncate max-w-xs">{attachment.url}</p>
+                            )}
+                          </div>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setFormData(prev => ({
+                              ...prev,
+                              attachments: prev.attachments.filter(att => att.id !== attachment.id)
+                            }))
+                          }}
+                          className="text-slate-400 hover:text-red-600"
+                        >
+                          <ApperIcon name="X" size={14} />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
 
 <div className="space-y-4">
                 <div>

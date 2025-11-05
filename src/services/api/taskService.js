@@ -49,7 +49,8 @@ const taskService = {
 const newTask = {
           id: generateId(),
           title: taskData.title,
-          description: taskData.description || "",
+          notes: taskData.notes || "",
+          attachments: taskData.attachments || [],
           dueDate: taskData.dueDate || null,
           category: taskData.category || null,
           completed: false,

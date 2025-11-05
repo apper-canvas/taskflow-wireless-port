@@ -1,48 +1,88 @@
 [
-  {
+{
     "Id": 1,
     "title": "Review quarterly budget report",
-    "description": "Analyze Q4 financial performance and prepare recommendations for next quarter",
+    "notes": "Analyze Q4 financial performance and prepare recommendations for next quarter. Focus on comparing actual vs. budgeted expenses across all departments. Need to identify cost-saving opportunities and revenue optimization strategies for Q1 2025.",
+    "attachments": [
+      {
+        "id": "att-1",
+        "type": "link",
+        "name": "Q4 Budget Template",
+        "url": "https://docs.google.com/spreadsheets/budget-template"
+      },
+      {
+        "id": "att-2",
+        "type": "file",
+        "name": "Previous Quarter Report.pdf",
+        "size": 245760,
+        "data": "base64-encoded-file-data"
+      }
+    ],
     "dueDate": "2024-12-30",
     "category": "Work",
     "completed": false,
     "createdAt": "2024-12-10T10:30:00.000Z",
     "updatedAt": "2024-12-10T10:30:00.000Z"
   },
-  {
+{
     "Id": 2,
     "title": "Buy groceries for dinner party",
-    "description": "Get ingredients for pasta, salad, and dessert for Saturday's dinner party",
+    "notes": "Get ingredients for pasta, salad, and dessert for Saturday's dinner party. Menu includes: garlic bread, Caesar salad, chicken alfredo pasta, and tiramisu. Expecting 8 guests. Don't forget wine pairing suggestions from the sommelier.",
+    "attachments": [
+      {
+        "id": "att-3",
+        "type": "link",
+        "name": "Shopping List Template",
+        "url": "https://docs.google.com/document/shopping-list"
+      }
+    ],
     "dueDate": "2024-12-28",
     "category": "Shopping",
     "completed": false,
     "createdAt": "2024-12-10T08:15:00.000Z",
     "updatedAt": "2024-12-10T08:15:00.000Z"
   },
-  {
+{
     "Id": 3,
     "title": "Schedule annual health checkup",
-    "description": "Book appointments with primary care physician and dentist",
+    "notes": "Book appointments with primary care physician and dentist. Also schedule eye exam and dermatology screening. Review insurance coverage and update emergency contact information.",
+    "attachments": [],
     "dueDate": "2024-12-25",
     "category": "Health",
     "completed": true,
     "createdAt": "2024-12-08T14:20:00.000Z",
     "updatedAt": "2024-12-10T09:45:00.000Z"
   },
-  {
+{
     "Id": 4,
     "title": "Plan weekend hiking trip",
-    "description": "Research trails, check weather, and pack gear for Sunday hike",
+    "notes": "Research trails, check weather, and pack gear for Sunday hike. Looking at moderate difficulty trails within 2-hour drive. Need to coordinate with hiking group and confirm transportation arrangements.",
+    "attachments": [
+      {
+        "id": "att-4",
+        "type": "link",
+        "name": "Trail Maps",
+        "url": "https://alltrails.com/explore/trail-maps"
+      },
+      {
+        "id": "att-5",
+        "type": "file",
+        "name": "Packing Checklist.txt",
+        "size": 1024,
+        "data": "base64-encoded-checklist-data"
+      }
+    ],
     "dueDate": null,
     "category": "Personal",
     "completed": false,
     "createdAt": "2024-12-09T16:00:00.000Z",
     "updatedAt": "2024-12-09T16:00:00.000Z"
   },
-  {
+{
     "Id": 5,
     "title": "Update investment portfolio",
-    "description": "Review performance and rebalance asset allocation",
+    "notes": "Review performance and rebalance asset allocation. Target allocation: 60% stocks, 30% bonds, 10% alternatives. Consider tax implications before making changes. Schedule meeting with financial advisor.",
+    "attachments": [],
     "dueDate": "2024-12-31",
     "category": "Finance",
     "completed": false,
