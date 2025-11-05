@@ -1,0 +1,224 @@
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import ApperIcon from '@/components/ApperIcon'
+import Button from '@/components/atoms/Button'
+import Input from '@/components/atoms/Input'
+import Textarea from '@/components/atoms/Textarea'
+import { cn } from '@/utils/cn'
+
+const TaskModal = ({ isOpen, onClose, onSubmit, initialData = null }) => {
+  const [formData, setFormData] = useState({
+    title: '',
+    description: ''
+  })
+  const [errors, setErrors] = useState({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        title: initialData.title || '',
+        description: initialData.description || ''
+      })
+    } else {
+      setFormData({
+        title: '',
+        description: ''
+      })
+    }
+    setErrors({})
+  }, [initialData, isOpen])
+
+  const validateForm = () => {
+    const newErrors = {}
+    
+    if (!formData.title.trim()) {
+      newErrors.title = 'Task title is required'
+    } else if (formData.title.length > 100) {
+      newErrors.title = 'Title must be less than 100 characters'
+    }
+    
+    if (formData.description && formData.description.length > 500) {
+      newErrors.description = 'Description must be less than 500 characters'
+    }
+    
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    
+    if (!validateForm()) return
+    
+    setIsSubmitting(true)
+    try {
+      await onSubmit(formData)
+      setFormData({ title: '', description: '' })
+      setErrors({})
+      onClose()
+    } catch (error) {
+      setErrors({ submit: 'Failed to save task. Please try again.' })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }))
+    
+    // Clear field error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: ''
+      }))
+    }
+  }
+
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose()
+    }
+  }
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop"
+          onClick={handleBackdropClick}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={{ duration: 0.2 }}
+            className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden animate-shake"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="bg-gradient-to-r from-indigo-500 to-violet-500 px-6 py-5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                    <ApperIcon name="Plus" size={18} className="text-white" />
+                  </div>
+                  <h2 className="text-xl font-bold text-white">
+                    {initialData ? 'Edit Task' : 'Create New Task'}
+                  </h2>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onClose}
+                  className="w-8 h-8 p-0 text-white/70 hover:text-white hover:bg-white/20 rounded-lg"
+                >
+                  <ApperIcon name="X" size={18} />
+                </Button>
+              </div>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="p-6 space-y-6">
+              {/* Title Field */}
+              <div className="space-y-2">
+                <label htmlFor="title" className="block text-sm font-semibold text-slate-700">
+                  Task Title
+                </label>
+                <Input
+                  id="title"
+                  value={formData.title}
+                  onChange={(e) => handleInputChange('title', e.target.value)}
+                  placeholder="Enter your task title..."
+                  error={!!errors.title}
+                  autoFocus
+                  maxLength={100}
+                />
+                {errors.title && (
+                  <p className="text-sm text-red-600 flex items-center gap-1">
+                    <ApperIcon name="AlertCircle" size={14} />
+                    {errors.title}
+                  </p>
+                )}
+              </div>
+
+              {/* Description Field */}
+              <div className="space-y-2">
+                <label htmlFor="description" className="block text-sm font-semibold text-slate-700">
+                  Description <span className="text-slate-400 font-normal">(optional)</span>
+                </label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  placeholder="Add more details about your task..."
+                  error={!!errors.description}
+                  rows={3}
+                  maxLength={500}
+                />
+                {errors.description && (
+                  <p className="text-sm text-red-600 flex items-center gap-1">
+                    <ApperIcon name="AlertCircle" size={14} />
+                    {errors.description}
+                  </p>
+                )}
+                <div className="flex justify-between text-xs text-slate-400">
+                  <span>{formData.description.length}/500 characters</span>
+                </div>
+              </div>
+
+              {/* Submit Error */}
+              {errors.submit && (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+                  <p className="text-sm text-red-600 flex items-center gap-2">
+                    <ApperIcon name="AlertTriangle" size={16} />
+                    {errors.submit}
+                  </p>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={onClose}
+                  className="flex-1"
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="flex-1"
+                  disabled={isSubmitting || !formData.title.trim()}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <ApperIcon name="Loader2" size={18} className="animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <ApperIcon name="Check" size={18} />
+                      {initialData ? 'Update Task' : 'Create Task'}
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
+
+export default TaskModal

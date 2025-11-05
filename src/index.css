@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* React Toastify Styles */
+@import 'react-toastify/dist/ReactToastify.css';
+
+/* Custom toast styling */
+.Toastify__toast {
+  @apply rounded-xl shadow-lg font-inter;
+}
+
+.Toastify__toast--success {
+  @apply bg-emerald-50 border border-emerald-200;
+}
+
+.Toastify__toast--error {
+  @apply bg-red-50 border border-red-200;
+}
+
+.Toastify__toast--info {
+  @apply bg-blue-50 border border-blue-200;
+}
+
+.Toastify__toast-body {
+  @apply text-sm font-medium;
+}
+
+.Toastify__progress-bar--success {
+  @apply bg-emerald-500;
+}
+
+.Toastify__progress-bar--error {
+  @apply bg-red-500;
+}
+
+.Toastify__progress-bar--info {
+  @apply bg-blue-500;
+}
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+  }
+}
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate-100 rounded-full;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-400;
+}
+
+/* Checkbox custom styles */
+.custom-checkbox {
+  @apply relative w-6 h-6 rounded-full border-2 border-slate-300 bg-white transition-all duration-200 ease-out cursor-pointer;
+}
+
+.custom-checkbox:hover {
+  @apply border-indigo-400 scale-110;
+}
+
+.custom-checkbox.checked {
+  @apply bg-emerald-500 border-emerald-500;
+}
+
+.custom-checkbox.checked:hover {
+  @apply bg-emerald-600 border-emerald-600;
+}
+
+.custom-checkbox .checkmark {
+  @apply absolute inset-0 flex items-center justify-center text-white opacity-0 transition-opacity duration-200;
+}
+
+.custom-checkbox.checked .checkmark {
+  @apply opacity-100;
+}
+
+/* Task card animations */
+.task-card {
+  @apply transition-all duration-200 ease-out;
+}
+
+.task-card:hover {
+  @apply shadow-lg shadow-slate-200/50 -translate-y-1;
+}
+
+.task-completed {
+  @apply opacity-40 transition-opacity duration-300;
+}
+
+/* FAB button pulse animation */
+.fab-pulse {
+  animation: pulse-indigo 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-indigo {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
+  }
+}
+
+/* Modal backdrop blur */
+.modal-backdrop {
+  backdrop-filter: blur(4px);
+  background-color: rgba(15, 23, 42, 0.4);
+}
+
+/* Input focus glow effect */
+.input-glow:focus {
+  @apply ring-2 ring-indigo-500/20 border-indigo-500;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
