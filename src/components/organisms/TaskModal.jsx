@@ -11,7 +11,8 @@ const TaskModal = ({ isOpen, onClose, onSubmit, initialData = null }) => {
 const [formData, setFormData] = useState({
     title: '',
     description: '',
-    dueDate: ''
+    dueDate: '',
+    category: ''
   })
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -19,15 +20,17 @@ const [formData, setFormData] = useState({
   useEffect(() => {
 if (initialData) {
       setFormData({
-        title: initialData.title || '',
+title: initialData.title || '',
         description: initialData.description || '',
-        dueDate: initialData.dueDate ? initialData.dueDate.split('T')[0] : ''
+        dueDate: initialData.dueDate ? initialData.dueDate.split('T')[0] : '',
+        category: initialData.category || ''
       })
     } else {
       setFormData({
         title: '',
-        description: '',
-        dueDate: ''
+description: '',
+        dueDate: '',
+        category: ''
       })
     }
     setErrors({})
@@ -36,18 +39,22 @@ if (initialData) {
   const validateForm = () => {
     const newErrors = {}
     
-    if (!formData.title.trim()) {
+if (!formData.title.trim()) {
       newErrors.title = 'Task title is required'
     } else if (formData.title.length > 100) {
       newErrors.title = 'Title must be less than 100 characters'
     }
     
-if (formData.description && formData.description.length > 500) {
+    if (formData.description && formData.description.length > 500) {
       newErrors.description = 'Description must be less than 500 characters'
     }
 
     if (formData.dueDate && new Date(formData.dueDate) < new Date().setHours(0, 0, 0, 0)) {
       newErrors.dueDate = 'Due date cannot be in the past'
+    }
+
+    if (formData.category === 'other' && !formData.customCategory?.trim()) {
+      newErrors.category = 'Please specify a custom category'
     }
     
     setErrors(newErrors)
@@ -181,6 +188,63 @@ try {
                   <span>{formData.description.length}/500 characters</span>
                 </div>
 </div>
+
+<div className="space-y-4">
+                <div>
+                  <label htmlFor="category" className="block text-sm font-medium text-slate-700 mb-2">
+                    Category
+                  </label>
+                  <select
+                    id="category"
+                    value={formData.category}
+                    onChange={(e) => {
+                      setFormData(prev => ({ 
+                        ...prev, 
+                        category: e.target.value,
+                        customCategory: e.target.value === 'other' ? prev.customCategory : ''
+                      }))
+                      if (errors.category) {
+                        setErrors(prev => ({ ...prev, category: '' }))
+                      }
+                    }}
+                    className={`w-full px-4 py-3 border rounded-xl bg-white text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 ${
+                      errors.category ? 'border-red-300 bg-red-50' : 'border-slate-200'
+                    }`}
+                  >
+                    <option value="">Select a category (optional)</option>
+                    <option value="Work">Work</option>
+                    <option value="Personal">Personal</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Health">Health</option>
+                    <option value="Finance">Finance</option>
+                    <option value="other">Other...</option>
+                  </select>
+                  {errors.category && (
+                    <p className="mt-1 text-sm text-red-600">{errors.category}</p>
+                  )}
+                </div>
+
+                {formData.category === 'other' && (
+                  <div>
+                    <label htmlFor="customCategory" className="block text-sm font-medium text-slate-700 mb-2">
+                      Custom Category
+                    </label>
+                    <Input
+                      id="customCategory"
+                      type="text"
+                      placeholder="Enter custom category"
+                      value={formData.customCategory || ''}
+                      onChange={(e) => {
+                        setFormData(prev => ({ ...prev, customCategory: e.target.value }))
+                        if (errors.category) {
+                          setErrors(prev => ({ ...prev, category: '' }))
+                        }
+                      }}
+                      className={errors.category ? 'border-red-300 bg-red-50' : ''}
+                    />
+                  </div>
+                )}
+              </div>
 
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-3">

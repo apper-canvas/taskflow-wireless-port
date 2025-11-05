@@ -51,6 +51,7 @@ const newTask = {
           title: taskData.title,
           description: taskData.description || "",
           dueDate: taskData.dueDate || null,
+          category: taskData.category || null,
           completed: false,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
@@ -67,7 +68,7 @@ const newTask = {
       setTimeout(() => {
         const index = tasks.findIndex(task => task.id === id)
 if (index !== -1) {
-          tasks[index] = {
+tasks[index] = {
             ...tasks[index],
             ...updateData,
             updatedAt: new Date().toISOString()

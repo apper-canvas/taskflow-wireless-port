@@ -1,1 +1,52 @@
-[]
+[
+  {
+    "Id": 1,
+    "title": "Review quarterly budget report",
+    "description": "Analyze Q4 financial performance and prepare recommendations for next quarter",
+    "dueDate": "2024-12-30",
+    "category": "Work",
+    "completed": false,
+    "createdAt": "2024-12-10T10:30:00.000Z",
+    "updatedAt": "2024-12-10T10:30:00.000Z"
+  },
+  {
+    "Id": 2,
+    "title": "Buy groceries for dinner party",
+    "description": "Get ingredients for pasta, salad, and dessert for Saturday's dinner party",
+    "dueDate": "2024-12-28",
+    "category": "Shopping",
+    "completed": false,
+    "createdAt": "2024-12-10T08:15:00.000Z",
+    "updatedAt": "2024-12-10T08:15:00.000Z"
+  },
+  {
+    "Id": 3,
+    "title": "Schedule annual health checkup",
+    "description": "Book appointments with primary care physician and dentist",
+    "dueDate": "2024-12-25",
+    "category": "Health",
+    "completed": true,
+    "createdAt": "2024-12-08T14:20:00.000Z",
+    "updatedAt": "2024-12-10T09:45:00.000Z"
+  },
+  {
+    "Id": 4,
+    "title": "Plan weekend hiking trip",
+    "description": "Research trails, check weather, and pack gear for Sunday hike",
+    "dueDate": null,
+    "category": "Personal",
+    "completed": false,
+    "createdAt": "2024-12-09T16:00:00.000Z",
+    "updatedAt": "2024-12-09T16:00:00.000Z"
+  },
+  {
+    "Id": 5,
+    "title": "Update investment portfolio",
+    "description": "Review performance and rebalance asset allocation",
+    "dueDate": "2024-12-31",
+    "category": "Finance",
+    "completed": false,
+    "createdAt": "2024-12-07T11:30:00.000Z",
+    "updatedAt": "2024-12-07T11:30:00.000Z"
+  }
+]
