@@ -148,12 +148,35 @@ const handleCreateTask = async (taskData) => {
 
           <AnimatePresence mode="popLayout">
             {tasks
-              .sort((a, b) => {
+.sort((a, b) => {
                 // Sort by completion status first (incomplete tasks first)
                 if (a.completed !== b.completed) {
                   return a.completed ? 1 : -1
                 }
-                // Then sort by creation date (newest first)
+                
+                // For incomplete tasks, sort by due date priority
+                if (!a.completed && !b.completed) {
+                  const now = new Date()
+                  const aOverdue = a.dueDate && new Date(a.dueDate) < now
+                  const bOverdue = b.dueDate && new Date(b.dueDate) < now
+                  
+                  // Overdue tasks first
+                  if (aOverdue !== bOverdue) {
+                    return aOverdue ? -1 : 1
+                  }
+                  
+                  // Then by due date (closest first)
+                  if (a.dueDate && b.dueDate) {
+                    return new Date(a.dueDate) - new Date(b.dueDate)
+                  }
+                  
+                  // Tasks with due dates before tasks without
+                  if (a.dueDate !== b.dueDate) {
+                    return a.dueDate ? -1 : 1
+                  }
+                }
+                
+                // Finally sort by creation date (newest first)
                 return new Date(b.createdAt) - new Date(a.createdAt)
               })
               .map((task) => (

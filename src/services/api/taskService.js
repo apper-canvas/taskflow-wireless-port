@@ -46,10 +46,11 @@ const taskService = {
   create: (taskData) => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const newTask = {
+const newTask = {
           id: generateId(),
           title: taskData.title,
           description: taskData.description || "",
+          dueDate: taskData.dueDate || null,
           completed: false,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
@@ -65,7 +66,7 @@ const taskService = {
     return new Promise((resolve) => {
       setTimeout(() => {
         const index = tasks.findIndex(task => task.id === id)
-        if (index !== -1) {
+if (index !== -1) {
           tasks[index] = {
             ...tasks[index],
             ...updateData,

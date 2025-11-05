@@ -1,9 +1,10 @@
-import { useState } from 'react'
-import ApperIcon from '@/components/ApperIcon'
-import Checkbox from '@/components/atoms/Checkbox'
-import Button from '@/components/atoms/Button'
-import { cn } from '@/utils/cn'
-import { motion } from 'framer-motion'
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { format } from "date-fns";
+import ApperIcon from "@/components/ApperIcon";
+import Button from "@/components/atoms/Button";
+import Checkbox from "@/components/atoms/Checkbox";
+import { cn } from "@/utils/cn";
 
 const TaskCard = ({ task, onToggleComplete, onDelete, onEdit }) => {
   const [isDeleting, setIsDeleting] = useState(false)
@@ -56,11 +57,37 @@ return (
             </p>
           )}
           
-          <div className="flex items-center gap-4 mt-4 text-xs text-slate-400">
+<div className="flex items-center gap-4 mt-4 text-xs text-slate-400">
             <div className="flex items-center gap-1">
               <ApperIcon name="Clock" size={12} />
               <span>{new Date(task.createdAt).toLocaleDateString()}</span>
             </div>
+            
+            {task.dueDate && (
+              <div className={cn(
+                "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium",
+                (() => {
+                  const dueDate = new Date(task.dueDate)
+                  const today = new Date()
+                  const tomorrow = new Date(today)
+                  tomorrow.setDate(today.getDate() + 1)
+                  
+                  if (dueDate < today.setHours(0, 0, 0, 0)) {
+                    return "text-red-600 bg-red-50 border border-red-200"
+                  } else if (dueDate.toDateString() === today.toDateString()) {
+                    return "text-amber-600 bg-amber-50 border border-amber-200"
+                  } else if (dueDate <= tomorrow.setHours(23, 59, 59, 999)) {
+                    return "text-emerald-600 bg-emerald-50 border border-emerald-200"
+                  } else {
+                    return "text-slate-600 bg-slate-50 border border-slate-200"
+                  }
+                })()
+              )}>
+                <ApperIcon name="Calendar" size={12} />
+                <span>Due {format(new Date(task.dueDate), 'MMM d')}</span>
+              </div>
+            )}
+            
             {task.completed && (
               <div className="flex items-center gap-1 text-emerald-500">
                 <ApperIcon name="CheckCircle" size={12} />

@@ -1,29 +1,33 @@
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import ApperIcon from '@/components/ApperIcon'
-import Button from '@/components/atoms/Button'
-import Input from '@/components/atoms/Input'
-import Textarea from '@/components/atoms/Textarea'
-import { cn } from '@/utils/cn'
+import React, { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import ApperIcon from "@/components/ApperIcon";
+import Textarea from "@/components/atoms/Textarea";
+import Button from "@/components/atoms/Button";
+import Input from "@/components/atoms/Input";
+import DateInput from "@/components/atoms/DateInput";
+import { cn } from "@/utils/cn";
 
 const TaskModal = ({ isOpen, onClose, onSubmit, initialData = null }) => {
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
     title: '',
-    description: ''
+    description: '',
+    dueDate: ''
   })
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
-    if (initialData) {
+if (initialData) {
       setFormData({
         title: initialData.title || '',
-        description: initialData.description || ''
+        description: initialData.description || '',
+        dueDate: initialData.dueDate ? initialData.dueDate.split('T')[0] : ''
       })
     } else {
       setFormData({
         title: '',
-        description: ''
+        description: '',
+        dueDate: ''
       })
     }
     setErrors({})
@@ -38,8 +42,12 @@ const TaskModal = ({ isOpen, onClose, onSubmit, initialData = null }) => {
       newErrors.title = 'Title must be less than 100 characters'
     }
     
-    if (formData.description && formData.description.length > 500) {
+if (formData.description && formData.description.length > 500) {
       newErrors.description = 'Description must be less than 500 characters'
+    }
+
+    if (formData.dueDate && new Date(formData.dueDate) < new Date().setHours(0, 0, 0, 0)) {
+      newErrors.dueDate = 'Due date cannot be in the past'
     }
     
     setErrors(newErrors)
@@ -52,9 +60,9 @@ const TaskModal = ({ isOpen, onClose, onSubmit, initialData = null }) => {
     if (!validateForm()) return
     
     setIsSubmitting(true)
-    try {
+try {
       await onSubmit(formData)
-      setFormData({ title: '', description: '' })
+      setFormData({ title: '', description: '', dueDate: '' })
       setErrors({})
       onClose()
     } catch (error) {
@@ -172,6 +180,23 @@ const TaskModal = ({ isOpen, onClose, onSubmit, initialData = null }) => {
                 <div className="flex justify-between text-xs text-slate-400">
                   <span>{formData.description.length}/500 characters</span>
                 </div>
+</div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-3">
+                  Due Date
+                </label>
+                <DateInput
+                  value={formData.dueDate}
+                  onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
+                  error={!!errors.dueDate}
+                  placeholder="Select due date"
+                />
+                {errors.dueDate && (
+                  <p className="text-red-500 text-xs mt-1 animate-shake">
+                    {errors.dueDate}
+                  </p>
+                )}
               </div>
 
               {/* Submit Error */}
