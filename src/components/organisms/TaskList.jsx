@@ -20,6 +20,7 @@ const [tasks, setTasks] = useState([])
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [taskToDelete, setTaskToDelete] = useState(null)
   const [editingTask, setEditingTask] = useState(null)
+  const [sortBy, setSortBy] = useState('dueDate')
   const loadTasks = async () => {
     setLoading(true)
     setError("")
@@ -137,46 +138,113 @@ const handleCreateTask = async (taskData) => {
         />
       ) : (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+<div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
               Your Tasks
             </h2>
-            <span className="text-sm text-slate-500">
-              {tasks.filter(t => !t.completed).length} pending
-            </span>
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="appearance-none bg-white border border-slate-200 rounded-xl px-4 py-2 pr-8 text-sm font-medium text-slate-700 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+                >
+                  <option value="dueDate">Sort by Due Date</option>
+                  <option value="priority">Sort by Priority</option>
+                  <option value="createdAt">Sort by Created Date</option>
+                  <option value="alphabetical">Sort Alphabetically</option>
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+              <span className="text-sm text-slate-500">
+                {tasks.filter(t => !t.completed).length} pending
+              </span>
+            </div>
           </div>
 
           <AnimatePresence mode="popLayout">
-            {tasks
-.sort((a, b) => {
+{tasks
+              .sort((a, b) => {
                 // Sort by completion status first (incomplete tasks first)
                 if (a.completed !== b.completed) {
                   return a.completed ? 1 : -1
                 }
                 
-                // For incomplete tasks, sort by due date priority
-                if (!a.completed && !b.completed) {
-                  const now = new Date()
-                  const aOverdue = a.dueDate && new Date(a.dueDate) < now
-                  const bOverdue = b.dueDate && new Date(b.dueDate) < now
+                // Apply selected sort method
+                switch (sortBy) {
+                  case 'dueDate':
+                    // For tasks with the same completion status, sort by due date priority
+                    if (a.completed === b.completed) {
+                      const now = new Date()
+                      const aOverdue = a.dueDate && new Date(a.dueDate) < now
+                      const bOverdue = b.dueDate && new Date(b.dueDate) < now
+                      
+                      // Overdue tasks first
+                      if (aOverdue !== bOverdue) {
+                        return aOverdue ? -1 : 1
+                      }
+                      
+                      // Then by due date (closest first)
+                      if (a.dueDate && b.dueDate) {
+                        return new Date(a.dueDate) - new Date(b.dueDate)
+                      }
+                      
+                      // Tasks with due dates before tasks without
+                      if (a.dueDate !== b.dueDate) {
+                        return a.dueDate ? -1 : 1
+                      }
+                    }
+                    break
                   
-                  // Overdue tasks first
-                  if (aOverdue !== bOverdue) {
-                    return aOverdue ? -1 : 1
-                  }
+                  case 'priority':
+                    // Sort by priority: overdue tasks first, then by due date proximity
+                    if (a.completed === b.completed) {
+                      const now = new Date()
+                      const aDueDate = a.dueDate ? new Date(a.dueDate) : null
+                      const bDueDate = b.dueDate ? new Date(b.dueDate) : null
+                      
+                      // Calculate priority scores (lower is higher priority)
+                      const getPriorityScore = (task) => {
+                        if (!task.dueDate) return 1000 // No due date = lowest priority
+                        const dueDate = new Date(task.dueDate)
+                        const daysUntilDue = Math.ceil((dueDate - now) / (1000 * 60 * 60 * 24))
+                        
+                        if (daysUntilDue < 0) return -Math.abs(daysUntilDue) // Overdue tasks (negative = high priority)
+                        if (daysUntilDue === 0) return 0.1 // Due today
+                        if (daysUntilDue <= 7) return daysUntilDue // Due this week
+                        return 100 + daysUntilDue // Due later
+                      }
+                      
+                      return getPriorityScore(a) - getPriorityScore(b)
+                    }
+                    break
                   
-                  // Then by due date (closest first)
-                  if (a.dueDate && b.dueDate) {
-                    return new Date(a.dueDate) - new Date(b.dueDate)
-                  }
+                  case 'createdAt':
+                    // Sort by creation date (newest first)
+                    if (a.completed === b.completed) {
+                      return new Date(b.createdAt) - new Date(a.createdAt)
+                    }
+                    break
                   
-                  // Tasks with due dates before tasks without
-                  if (a.dueDate !== b.dueDate) {
-                    return a.dueDate ? -1 : 1
-                  }
+                  case 'alphabetical':
+                    // Sort alphabetically by title
+                    if (a.completed === b.completed) {
+                      return a.title.localeCompare(b.title, undefined, { sensitivity: 'base' })
+                    }
+                    break
+                  
+                  default:
+                    // Default to creation date if unknown sort method
+                    if (a.completed === b.completed) {
+                      return new Date(b.createdAt) - new Date(a.createdAt)
+                    }
                 }
                 
-                // Finally sort by creation date (newest first)
+                // Fallback to creation date for same completion status
                 return new Date(b.createdAt) - new Date(a.createdAt)
               })
               .map((task) => (
