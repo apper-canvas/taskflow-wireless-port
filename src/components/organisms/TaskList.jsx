@@ -12,13 +12,14 @@ import Error from '@/components/ui/Error'
 import Empty from '@/components/ui/Empty'
 
 const TaskListComponent = () => {
-  const [tasks, setTasks] = useState([])
+const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [taskToDelete, setTaskToDelete] = useState(null)
-
+  const [editingTask, setEditingTask] = useState(null)
   const loadTasks = async () => {
     setLoading(true)
     setError("")
@@ -36,7 +37,7 @@ const TaskListComponent = () => {
     loadTasks()
   }, [])
 
-  const handleCreateTask = async (taskData) => {
+const handleCreateTask = async (taskData) => {
     try {
       const newTask = await taskService.create(taskData)
       setTasks(prev => [newTask, ...prev])
@@ -45,6 +46,26 @@ const TaskListComponent = () => {
       })
     } catch (err) {
       toast.error("Failed to create task. Please try again.")
+      throw err
+    }
+  }
+
+  const handleEditTask = (task) => {
+    setEditingTask(task)
+    setIsEditModalOpen(true)
+  }
+
+  const handleUpdateTask = async (taskData) => {
+    try {
+      const updatedTask = await taskService.update(editingTask.id, taskData)
+      setTasks(prev => prev.map(task => 
+        task.id === editingTask.id ? updatedTask : task
+      ))
+      toast.success("Task updated successfully!", {
+        icon: "✅"
+      })
+    } catch (err) {
+      toast.error("Failed to update task. Please try again.")
       throw err
     }
   }
@@ -136,11 +157,12 @@ const TaskListComponent = () => {
                 return new Date(b.createdAt) - new Date(a.createdAt)
               })
               .map((task) => (
-                <TaskCard
+<TaskCard
                   key={task.id}
                   task={task}
                   onToggleComplete={handleToggleComplete}
                   onDelete={handleDeleteRequest}
+                  onEdit={handleEditTask}
                 />
               ))}
           </AnimatePresence>
@@ -151,10 +173,20 @@ const TaskListComponent = () => {
       <FloatingAddButton onClick={() => setIsTaskModalOpen(true)} />
 
       {/* Task Modal */}
-      <TaskModal
+<TaskModal
         isOpen={isTaskModalOpen}
         onClose={() => setIsTaskModalOpen(false)}
         onSubmit={handleCreateTask}
+      />
+
+      <TaskModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false)
+          setEditingTask(null)
+        }}
+        onSubmit={handleUpdateTask}
+        initialData={editingTask}
       />
 
       {/* Delete Confirmation Modal */}

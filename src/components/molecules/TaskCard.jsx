@@ -5,7 +5,7 @@ import Button from '@/components/atoms/Button'
 import { cn } from '@/utils/cn'
 import { motion } from 'framer-motion'
 
-const TaskCard = ({ task, onToggleComplete, onDelete }) => {
+const TaskCard = ({ task, onToggleComplete, onDelete, onEdit }) => {
   const [isDeleting, setIsDeleting] = useState(false)
 
   const handleToggleComplete = () => {
@@ -18,15 +18,16 @@ const TaskCard = ({ task, onToggleComplete, onDelete }) => {
     setIsDeleting(false)
   }
 
-  return (
+return (
     <motion.div
       layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: -100 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
+      onClick={() => onEdit && onEdit(task)}
       className={cn(
-        "task-card bg-white rounded-2xl p-6 shadow-sm border border-slate-100",
+        "task-card bg-white rounded-2xl p-6 shadow-sm border border-slate-100 cursor-pointer",
         task.completed && "task-completed"
       )}
     >
